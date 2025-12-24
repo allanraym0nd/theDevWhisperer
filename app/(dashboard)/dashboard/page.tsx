@@ -62,8 +62,7 @@ export default async function DashboardPage() {
   const averageScore = scores.length > 0 
     ? (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1)
     : 0
-  
-  // Calculate streak (simplified - consecutive days with interviews)
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   
