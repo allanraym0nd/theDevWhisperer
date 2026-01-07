@@ -31,7 +31,7 @@ const interval = setInterval(() => {
                 elements,
                 appState: {
                     viewBackgroundColor:appState.viewBackgroundColor,
-                    currentItemFontFamily:appState.currentItemFontFamily
+                    // currentItemFontFamily:appState.currentItemFontFamily
                 }
             })
 
@@ -75,21 +75,37 @@ const interval = setInterval(() => {
     )
   }
 
-  return (
-    <div className="w-full h-full rounded-lg overflow-hidden border border-border">
-      <Excalidraw
-        excalidrawAPI={(api) => setExcalidrawAPI(api)}
-        theme="dark"
-        UIOptions={{
-          canvasActions: {
-            loadScene: false,
-            export: false,
-            saveAsImage: true,
-          }
-        }}
-      />
-    </div>
-  )
+return (
+  <div style={{ width: '100%', height: '400px', position: 'relative' }}>
+    <Excalidraw
+      excalidrawAPI={(api) => setExcalidrawAPI(api)}
+      theme="light"
+      initialData={{
+        elements: [],
+        appState: {
+          viewBackgroundColor: "#ffffff",
+          currentItemStrokeColor: "#000000",
+          currentItemBackgroundColor: "transparent",
+          currentItemFillStyle: "solid",
+          currentItemStrokeWidth: 2,
+          currentItemRoughness: 0,
+          currentItemOpacity: 100,
+          zenModeEnabled: false,
+        }
+      }}
+      UIOptions={{
+        canvasActions: {
+          loadScene: false,
+          export: false,
+          saveAsImage: true,
+        },
+        tools: {
+          image: false
+        }
+      }}
+    />
+  </div>
+)
  
     
 

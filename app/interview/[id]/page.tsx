@@ -8,7 +8,9 @@ import { TranscriptPanel } from '@/components/interview/transcript-panel'
 import { AiAvatar } from '@/components/interview/ai-avatar'
 import getSystemPrompt from '@/lib/groq/prompt'
 import { InterviewType } from '@/config/interview-types'
+import CanvasWrapper from '@/components/interview/canvas-wrapper'
 import { Button } from '@/components/ui/button'
+
 
 interface Message {
   role: 'ai' | 'user'
@@ -201,6 +203,20 @@ export default function InterviewPage() {
     }
   }
 
+  const saveCanvas = async (canvasData: any) => {
+    try { 
+      await fetch(`/api/canvas/${interviewId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({snapshot_data: canvasData})
+      })
+      console.log('Canvas saved')
+    }catch(error){
+      console.error('Failed to save canvas:', error)
+    }
+
+  }
+
   const handleEndInterview = async () => {
     stopListening()
     stopSpeaking()
@@ -247,10 +263,14 @@ return (
       {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left: Canvas placeholder (future) */}
-<div className="lg:col-span-2 space-y-6">
-  <div className="bg-card border border-border rounded-lg h-96 flex items-center justify-center">
-    <p className="text-muted-foreground">Canvas area (coming soon)</p>
-  </div>
+      <div className="lg:col-span-2 space-y-6">
+      <div className="bg-white rounded-lg overflow-hidden border border-border">
+          <CanvasWrapper 
+            interviewId={interviewId}
+            onSave={saveCanvas}
+          />
+        </div>
+
 
   {/* Voice Controls */}
   <VoiceControls
@@ -285,9 +305,6 @@ return (
   End Interview
 </button>
 </div>
-
-   
-
       
         {/* Right: AI Avatar + Transcript */}
         <div className="space-y-6">

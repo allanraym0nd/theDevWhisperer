@@ -3,9 +3,13 @@ import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError) {
+    console.log("AUTH ERROR TYPE:", authError.name);
+    console.log("AUTH ERROR MESSAGE:", authError.message);
+  }
+
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -25,7 +29,7 @@ export async function POST(request: Request) {
     .select()
     .single()
 
-    console.log('Supabase response:', { interview, error })
+  console.log('Supabase response:', { interview, error })
 
   if (error) {
     console.error('Database error:', error)  // ← Add logging
@@ -37,9 +41,9 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   const supabase = await createClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

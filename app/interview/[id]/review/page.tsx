@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import CanvasWrapper from '@/components/interview/canvas-wrapper'
 
 interface Message { 
     id: string
@@ -92,6 +93,19 @@ export default function ReviewPage() {
             <span>{formatDuration(interview.duration_seconds || 0)}</span>
           </div>
         </div>
+
+        {/* Canvas Review */}
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Diagram</h2>
+              <div className="h-96 rounded-lg">
+                <CanvasWrapper 
+                  interviewId={interviewId}
+                  onSave={() => {}} // Read-only in review
+                />
+              </div>
+            </CardContent>
+          </Card>
 
         {/* Transcript */}
         <Card>

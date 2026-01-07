@@ -10,7 +10,7 @@ const navigation = [
     {name: 'Home', href:'/dashboard', icon:Home},
     {name: 'Progess', href:'/progress', icon:BarChart3},
     {name: 'History', href:'/history', icon:History},
-    {name: 'Settings', href:'/settings', icon:Settings}
+    // {name: 'Settings', href:'/settings', icon:Settings}
 
 ]
 
