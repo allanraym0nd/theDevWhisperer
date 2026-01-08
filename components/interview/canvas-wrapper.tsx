@@ -1,112 +1,71 @@
 'use client'
 
-import { useState,useEffect } from "react"
-import dynamic from "next/dynamic"
-
-const Excalidraw = dynamic(
-    async () => (await import('@excalidraw/excalidraw')).Excalidraw,
-    {ssr: false}
-)
+import { useState, useEffect } from 'react'
+import { Tldraw } from 'tldraw'
+import 'tldraw/tldraw.css'
 
 interface CanvasWrapperProps {
-    interviewId: string
-    onSave?: (elements: any) => void
-
+  interviewId: string
+  onSave?: (snapshot: any) => void
 }
 
-export default function CanvasWrapper({interviewId, onSave}: CanvasWrapperProps) {
-    const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
-    const [isClient,setIsClient] = useState(false)
+export default function CanvasWrapper({ interviewId, onSave }: CanvasWrapperProps) {
+  const [editor, setEditor] = useState<any>(null)
+  const [isClient, setIsClient] = useState(false)
 
-useEffect(() => { 
-        setIsClient(true)
-        
-const interval = setInterval(() => {
-    if(excalidrawAPI) {
-        const elements = excalidrawAPI.getSceneElements()
-        const appState = excalidrawAPI.getAppState()
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
-            if(elements.length > 0 && onSave) {
-            onSave({
-                elements,
-                appState: {
-                    viewBackgroundColor:appState.viewBackgroundColor,
-                    // currentItemFontFamily:appState.currentItemFontFamily
-                }
-            })
+  // Auto-save canvas every 30 seconds
+  useEffect(() => {
+    if (!editor) return
 
-        }
+    const interval = setInterval(() => {
+      const snapshot = editor.store.getSnapshot()
+      if (onSave) {
+        onSave(snapshot)
+      }
+    }, 30000)
 
-        }
-        },30000)
-        return () => clearInterval(interval)
- }, [excalidrawAPI, onSave])
+    return () => clearInterval(interval)
+  }, [editor, onSave])
 
- //load saved canvas data
+  // Load saved canvas
+  useEffect(() => {
+    if (!editor) return
 
- useEffect(() => {
     async function loadCanvas() {
-        try {
-            const response = await fetch(`/api/canvas/${interviewId}`)
-            if(response.ok) {
-                const data = await response.json()
-                if(data.snapshot_data && excalidrawAPI) {
-                    excalidrawAPI.updateScene(data.snapshot_data)
-                }
-            }
-            
-        } catch(error) { 
-             console.log('No saved canvas found')
+      try {
+        const response = await fetch(`/api/canvas/${interviewId}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.snapshot_data) {
+            editor.store.loadSnapshot(data.snapshot_data)
+          }
         }
-        
+      } catch (error) {
+        // No saved canvas
+      }
     }
 
-    if(excalidrawAPI){
-        loadCanvas()
-    }
-
- }, [excalidrawAPI, interviewId])
+    loadCanvas()
+  }, [editor, interviewId])
 
   if (!isClient) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-card border border-border rounded-lg">
-        <p className="text-muted-foreground">Loading canvas...</p>
+      <div className="w-full h-full flex items-center justify-center bg-white border border-border rounded-lg">
+        <p className="text-gray-600">Loading canvas...</p>
       </div>
     )
   }
 
-return (
-  <div style={{ width: '100%', height: '400px', position: 'relative' }}>
-    <Excalidraw
-      excalidrawAPI={(api) => setExcalidrawAPI(api)}
-      theme="light"
-      initialData={{
-        elements: [],
-        appState: {
-          viewBackgroundColor: "#ffffff",
-          currentItemStrokeColor: "#000000",
-          currentItemBackgroundColor: "transparent",
-          currentItemFillStyle: "solid",
-          currentItemStrokeWidth: 2,
-          currentItemRoughness: 0,
-          currentItemOpacity: 100,
-          zenModeEnabled: false,
-        }
-      }}
-      UIOptions={{
-        canvasActions: {
-          loadScene: false,
-          export: false,
-          saveAsImage: true,
-        },
-        tools: {
-          image: false
-        }
-      }}
-    />
-  </div>
-)
- 
-    
-
+  return (
+    <div style={{ width: '100%', height: '400px' }}>
+      <Tldraw
+        onMount={(editor) => setEditor(editor)}
+        hideUi={false}
+      />
+    </div>
+  )
 }
