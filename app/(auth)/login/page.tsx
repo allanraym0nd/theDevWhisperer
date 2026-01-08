@@ -15,9 +15,9 @@ export default function LoginPage() {
   async function handleSubmit(formData: FormData) {
     setIsLoading(true)
     setError(null)
-    
+
     const result = await login(formData)
-    
+
     if (result?.error) {
       setError(result.error)
       setIsLoading(false)
@@ -47,7 +47,7 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -60,7 +60,7 @@ export default function LoginPage() {
                 className="transition-default"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -71,22 +71,30 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="transition-default"
               />
+              <div className="text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-default"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-4">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full transition-default"
               disabled={isLoading}
             >
               {isLoading ? 'Logging in...' : 'Log in'}
             </Button>
-            
+
             <p className="text-sm text-muted-foreground text-center">
               Don't have an account?{' '}
-              <Link 
-                href="/signup" 
+              <Link
+                href="/signup"
                 className="text-foreground hover:underline transition-default"
               >
                 Sign up
