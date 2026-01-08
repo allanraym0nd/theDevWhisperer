@@ -5,21 +5,21 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 
 export async function login(formData: FormData) {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const data = {
-        email: formData.get("email") as string,
-        password: formData.get("password") as string
-    }
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string
+  }
 
-    const {error} = await supabase.auth.signInWithPassword(data)
+  const { error } = await supabase.auth.signInWithPassword(data)
 
-    if(error){
-        return({error: error.message})
-    }
+  if (error) {
+    return ({ error: error.message })
+  }
 
-    revalidatePath('/', 'layout')
-    redirect('/dashboard')
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -40,9 +40,37 @@ export async function signup(formData: FormData) {
   redirect('/dashboard')
 }
 
+
+export async function requestPasswordReset(email: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/resetPassword`
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+  return { success: true }
+}
+
+export async function updatePassword(newPassword: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { success: true }
+}
+
 export async function signOut() {
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-    revalidatePath('/', 'layout')
-    redirect('/login')
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }
