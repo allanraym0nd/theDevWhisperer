@@ -1,0 +1,35 @@
+version: '3.8'
+
+services: 
+  web: # service name
+    build:
+    context: .
+    dockerfile: Dockerfile
+    container_name: rehearse-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+    env_file:
+      - .env.local
+    restart: unless stopped
+    networks:
+      - rehearse-network
+    healthcheck:
+      test: ["CMD" , "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start-period: 40s
+
+  networks:
+      rehearse-network:
+        driver:bridge
+
+
+    
